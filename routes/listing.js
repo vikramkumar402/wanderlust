@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js"); 
+const data = require("../init/data.js");
 const ExpressError = require("../utils/ExpressError.js");
 const { listingSchema } = require("../schema.js");
 const Listing = require("../models/listing.js");
@@ -18,13 +19,17 @@ const validateListing = (req, res, next) => {
 };
 
 // Index Route
-router.get(
-  "/",
-  wrapAsync(async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
-  })
-);
+router.get("/", (req, res) => {
+  res.render("listings/index.ejs", { allListings: data.data });
+});
+// router.get(
+//   "/",
+//   wrapAsync(async (req, res) => {
+//     // const allListings = await Listing.find({});
+//     // res.render("listings/index.ejs", { allListings });
+//       res.render("listings/index.ejs", { allListings: data });
+//   })
+// );
 
 // New Route
 router.get("/new", (req, res) => {
@@ -35,22 +40,42 @@ router.get("/new", (req, res) => {
   res.render("listings/new.ejs");
 });
 
+
+
 // Show Route
-router.get(
-  "/:id",
-  wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id)
-      .populate("reviews")
-      .populate("owner");
-    if (!listing) {
-      req.flash("error", "Listing you requested for doesn't exist");
-      return res.redirect("/listings");
-    }
-    console.log(listing);
-    res.render("listings/show.ejs", { listing });
-  })
-);
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  console.log("id",id);
+  // Find the listing with matching _id in your data array
+  const listing = data.data.find(l => l._id === parseInt(id));
+  console.log("listing",listing);
+  if (!listing) {
+    req.flash("error", "Listing you requested for doesn't exist");
+    return res.redirect("/listings");
+  }
+
+  // Ensure owner and reviews exist for EJS template
+  if (!listing.owner) listing.owner = { username: "Unknown" };
+  if (!listing.reviews) listing.reviews = [];
+
+  res.render("listings/show.ejs", { listing });
+});
+// router.get(
+//   "/:id",
+//   wrapAsync(async (req, res) => {
+//     let { id } = req.params;
+//     const listing = await Listing.findById(id)
+//       .populate("reviews")
+//       .populate("owner");
+//     if (!listing) {
+//       req.flash("error", "Listing you requested for doesn't exist");
+//       return res.redirect("/listings");
+//     }
+//     console.log(listing);
+//     res.render("listings/show.ejs", { listing });
+//   })
+// );
 
 // Create Route
 router.post(

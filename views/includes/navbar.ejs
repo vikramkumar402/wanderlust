@@ -23,17 +23,17 @@
       <!-- Left-aligned links -->
       <div class="navbar-nav">
         <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/listings">All Listings</a>
+        <a class="nav-link" href="/listings/">All Listings</a>
         <a class="nav-link" href="/listings/new">Add New Listing</a>
       </div>
 
       <!-- Right-aligned authentication links -->
       <div class="navbar-nav ms-auto">
-        <% if (!req.user) { %>
+        <% if (!currUser) { %>
           <a class="nav-link" href="/signup">Sign up</a>
           <a class="nav-link" href="/login">Log in</a>
         <% } else { %>
-          <a class="nav-link disabled">Welcome, <%= req.user.username %></a>
+          <a class="nav-link disabled">Welcome, <%= currUser.username %></a>
           <a class="nav-link" href="/logout">Log out</a>
         <% } %>
       </div>
